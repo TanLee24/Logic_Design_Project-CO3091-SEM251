@@ -7,5 +7,6 @@
 
 extern bool Wifi_reconnect();
 extern void startAP();
+void Wifi_Task(void *pvParameters);
 
 #endif

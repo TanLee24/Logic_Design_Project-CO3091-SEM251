@@ -44,3 +44,25 @@ bool Wifi_reconnect()
     startSTA();
     return false;
 }
+
+void Wifi_Task(void *pvParameters)
+{
+    Serial.println("Task Wi-Fi đang khởi động...");
+
+    startSTA();
+
+    Serial.println("Đã kết nối Wi-Fi!");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+
+    // Check every 2s
+    for(;;)
+    {
+        if (WiFi.status() != WL_CONNECTED)
+        {
+            Serial.println("Wi-Fi mất kết nối, đang reconnect...");
+            Wifi_reconnect();
+        }
+        vTaskDelay(200);
+    }
+}
