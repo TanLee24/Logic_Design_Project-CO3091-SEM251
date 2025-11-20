@@ -8,12 +8,12 @@
 #include "Wire.h"
 #include "DHT20.h"
 
-extern WebServer server;
+extern WebServer WiFiserver;
 
 String mainPage();
 String settingsPage();
 
-void startAP();
+void startAPMode();
 void setupServer();
 void connectToWiFi();
 

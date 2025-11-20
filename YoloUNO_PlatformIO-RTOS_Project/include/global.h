@@ -22,6 +22,14 @@ extern String CORE_IOT_TOKEN;
 extern String CORE_IOT_SERVER;
 extern String CORE_IOT_PORT;
 
+typedef struct {
+    float temp;
+    float humi;
+} DHT20_Data;
+
+extern DHT20_Data dht_data;
+extern SemaphoreHandle_t dht_mutex;
+
 extern boolean isWifiConnected;
 extern SemaphoreHandle_t xBinarySemaphoreInternet;
 

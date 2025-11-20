@@ -1,6 +1,6 @@
 #include "mainserver.h"
 
-WebServer server(80);
+WebServer WiFiserver(80);
 
 // State variables for webpage
 bool led_state = false;
@@ -12,8 +12,8 @@ Adafruit_NeoPixel pixels(1, NEO_PIN, NEO_GRB + NEO_KHZ800);
 int blinkInterval = 500;
 bool blinkMode = false;
 
-String WIFI_SSID = "ACLAB";
-String WIFI_PASS = "ACLAB2023";
+String WiFiSTA_ID = "ACLAB";
+String WiFiSTA_PASS = "ACLAB2023";
 
 /* ========== HTML PAGE ========== */
 String mainPage() {
@@ -173,7 +173,7 @@ void connectToWiFi()
     Serial.println("[WiFi] Trying STA Mode...");
 
     WiFi.mode(WIFI_AP_STA);
-    WiFi.begin(WIFI_SSID.c_str(), WIFI_PASS.c_str());
+    WiFi.begin(WiFiSTA_ID.c_str(), WiFiSTA_PASS.c_str());
 
     unsigned long start = millis();
     while (WiFi.status() != WL_CONNECTED && millis() - start < 8000) {
@@ -189,7 +189,7 @@ void connectToWiFi()
     else Serial.println("\n[WiFi] STA Failed.");
 }
 
-void startAP()
+void startAPMode()
 {
     Serial.println("[WiFi] Starting AP...");
 
@@ -210,96 +210,96 @@ void setupServer() {
     pixels.show();
 
     // Main page
-    server.on("/", []() {
-        server.send(200, "text/html", mainPage());
+    WiFiserver.on("/", []() {
+        WiFiserver.send(200, "text/html", mainPage());
     });
 
     // // LED — normal LED
-    // server.on("/led/on", []() {
+    // WiFiserver.on("/led/on", []() {
     //     led_state = true;
     //     digitalWrite(LED_PIN, HIGH);
-    //     server.sendHeader("Location", "/");
-    //     server.send(303);
+    //     WiFiserver.sendHeader("Location", "/");
+    //     WiFiserver.send(303);
     // });
 
-    // server.on("/led/off", []() {
+    // WiFiserver.on("/led/off", []() {
     //     led_state = false;
     //     digitalWrite(LED_PIN, LOW);
-    //     server.sendHeader("Location", "/");
-    //     server.send(303);
+    //     WiFiserver.sendHeader("Location", "/");
+    //     WiFiserver.send(303);
     // });
 
     // // NEO — NeoPixel LED
-    // server.on("/neo/on", []() {
+    // WiFiserver.on("/neo/on", []() {
     //     neo_state = true;
     //     pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Green
     //     pixels.show();
-    //     server.sendHeader("Location", "/");
-    //     server.send(303);
+    //     WiFiserver.sendHeader("Location", "/");
+    //     WiFiserver.send(303);
     // });
 
-    // server.on("/neo/off", []() {
+    // WiFiserver.on("/neo/off", []() {
     //     neo_state = false;
     //     pixels.clear();
     //     pixels.show();
-    //     server.sendHeader("Location", "/");
-    //     server.send(303);
+    //     WiFiserver.sendHeader("Location", "/");
+    //     WiFiserver.send(303);
     // });
 
-    server.on("/led/on", []() {
+    WiFiserver.on("/led/on", []() {
         led_state = true;
         digitalWrite(LED_PIN, HIGH);
-        server.send(200, "application/json", "{\"ok\":true}");
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
     
-    server.on("/led/off", []() {
+    WiFiserver.on("/led/off", []() {
         led_state = false;
         digitalWrite(LED_PIN, LOW);
-        server.send(200, "application/json", "{\"ok\":true}");
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
 
-    server.on("/blink/start", []() {
+    WiFiserver.on("/blink/start", []() {
         blinkMode = true;
-        server.send(200, "application/json", "{\"ok\":true}");
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
 
-    server.on("/blink/stop", []() {
+    WiFiserver.on("/blink/stop", []() {
         blinkMode = false;
-        server.send(200, "application/json", "{\"ok\":true}");
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
 
-    server.on("/neo/off", []() {
+    WiFiserver.on("/neo/off", []() {
         pixels.clear();
         pixels.show();
         neo_state = false;
-        server.send(200, "application/json", "{\"ok\":true}");
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
 
-    server.on("/blink/speed", []() {
-        if (server.hasArg("val")) blinkInterval = server.arg("val").toInt();
-        server.send(200, "application/json", "{\"ok\":true}");
+    WiFiserver.on("/blink/speed", []() {
+        if (WiFiserver.hasArg("val")) blinkInterval = WiFiserver.arg("val").toInt();
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
     
-    server.on("/neo/color", [](){
-        int r = server.arg("r").toInt();
-        int g = server.arg("g").toInt();
-        int b = server.arg("b").toInt();
+    WiFiserver.on("/neo/color", [](){
+        int r = WiFiserver.arg("r").toInt();
+        int g = WiFiserver.arg("g").toInt();
+        int b = WiFiserver.arg("b").toInt();
         
         pixels.setPixelColor(0, pixels.Color(r, g, b));
         pixels.show();
         neo_state = !(r == 0 && g == 0 && b == 0);
-        server.send(200, "application/json", "{\"ok\":true}");
+        WiFiserver.send(200, "application/json", "{\"ok\":true}");
     });
     
-    server.on("/state", [](){
+    WiFiserver.on("/state", [](){
         String json = "{";
         json += "\"led\":" + String(led_state ? "true" : "false") + ",";
         json += "\"neo\":" + String(neo_state ? "true" : "false");
         json += "}";
-        server.send(200, "application/json", json);
+        WiFiserver.send(200, "application/json", json);
     });
 
-    server.begin();
+    WiFiserver.begin();
     Serial.println("[Server] HTTP server started!");
 }
 
@@ -337,12 +337,12 @@ void main_server_task(void *pvParameters)
     Serial.println("[MainServer] Task started!");
 
     WiFi.onEvent(WiFiEvent);
-    startAP();          // Always start AP
-    connectToWiFi();    // Try to connect STA
-    setupServer();      // Start web server
+    startAPMode();
+    connectToWiFi();
+    setupServer();
 
     while (true) {
-        server.handleClient();
+        WiFiserver.handleClient();
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
