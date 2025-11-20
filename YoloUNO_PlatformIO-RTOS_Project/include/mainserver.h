@@ -3,12 +3,17 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
-#include "Adafruit_NeoPixel.h"
 #include "global.h"
-#include "Wire.h"
-#include "DHT20.h"
 
-extern WebServer server;
+#define LED1_PIN 48
+#define LED2_PIN 41
+#define BOOT_PIN 0
+//extern WebServer server;
+
+//extern bool isAPMode;
+
+
+
 
 String mainPage();
 String settingsPage();
@@ -18,13 +23,5 @@ void setupServer();
 void connectToWiFi();
 
 void main_server_task(void *pvParameters);
-
-extern int blinkInterval;
-extern bool blinkMode;
-void blink_mode(void *pvParameters);
-
-void enable_I2C(void);
-
-void DHT(void *pvParameters);
 
 #endif
