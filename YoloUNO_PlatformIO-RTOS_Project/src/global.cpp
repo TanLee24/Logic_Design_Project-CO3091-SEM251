@@ -14,6 +14,7 @@ String wifi_ssid = "abcde";
 String wifi_password = "123456789";
 boolean isWifiConnected = false;
 SemaphoreHandle_t xBinarySemaphoreInternet = xSemaphoreCreateBinary();
+SemaphoreHandle_t xSemaphoreCreateMutex = xSemaphoreCreateMutex();
 
 // RSSI (dBm)
 QueueHandle_t xQueueWifiStrength = xQueueCreate(5, sizeof(int)); 

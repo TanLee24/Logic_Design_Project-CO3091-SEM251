@@ -7,6 +7,7 @@
 #include "global.h"
 #include "Wire.h"
 #include "DHT20.h"
+#include "mainserver_sensor.h"
 
 extern WebServer WiFiserver;
 

@@ -18,6 +18,13 @@ String WiFiSTA_PASS = "ACLAB2023";
 
 /* ========== HTML PAGE ========== */
 String mainPage() {
+    float temperature = 0, humidity = 0;
+    if (dht_mutex && xSemaphoreTake(dht_mutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+        temperature = dht_data.temp;
+        humidity    = dht_data.humi;
+        xSemaphoreGive(dht_mutex);
+    }
+
     String currentIP = isAPMode ? WiFi.softAPIP().toString() : WiFi.localIP().toString();
     String modeText  = isAPMode ? "Access Point Mode" : "Connected to WiFi (Station Mode)";
     return R"rawliteral(
@@ -93,6 +100,21 @@ String mainPage() {
                         margin: 15px auto;
                         max-width: 300px;
                     }
+
+                    .sensor {
+                        background: #f8f9fa;
+                        color: #333;
+                        padding: 15px;
+                        border-radius: 12px;
+                        margin: 20px auto;
+                        max-width: 300px;
+                        font-size: 18px;
+                    }
+
+                    .dark .sensor {
+                        background: #2d2d2d;
+                        color: #eee;
+                    }
                 </style>
             </head>
             
@@ -100,11 +122,17 @@ String mainPage() {
                 <button class="toggle btn-blue" onclick="toggleDark()">Toggle Dark Mode</button>
                 <h1>ESP32 Control Panel</h1>
 
-                <!-- IP & Mode Display -->
+                <!-- IP + MODE DISPLAY -->
                 <div class="info">
                     <strong>Current IP:</strong><br>
                     )rawliteral" + currentIP + R"rawliteral(<br>
                     <em>)rawliteral" + modeText + R"rawliteral(</em>
+                </div>
+
+                <!-- SENSOR -->
+                <div class="sensor">
+                    Temperature: <strong id="temp">--</strong><br>
+                    Humidity: <strong id="humi">--</strong>
                 </div>
 
                 <!-- LED MANUAL + BLINK MODE -->
@@ -120,7 +148,7 @@ String mainPage() {
                     <button class="btn-off" onclick="send('/blink/stop')">Stop Blink</button>
 
                     <p>Blink Speed: <span id="speed_label">1000 ms</span></p>
-                    <input type="range" min="50" max="2000" value="1000" id="blink_slider" oninput="changeSpeed(this.value)">
+                    <input type="range" min="50" max="3000" value="1000" id="blink_slider" oninput="changeSpeed(this.value)">
                 </div>
                 
                 <!-- NEO PIXEL -->
@@ -171,7 +199,17 @@ String mainPage() {
                         document.getElementById("neo_state").innerHTML = "State: " + (data.neo ? "ON" : "OFF");
                     }
                         
-                    // ------------ PERIODIC SENSOR POLLING -------
+                    // ------------ SENSOR UPDATE -----------
+                    function updateSensors() {
+                        fetch("/sensors").then(r => r.json()).then(d => {
+                            document.getElementById("temp").innerText = d.temp.toFixed(1) + " °C";
+                            document.getElementById("humi").innerText = d.humi.toFixed(0) + " %";
+                        });
+                    }
+                    setInterval(updateSensors, 2000);
+                    updateSensors();
+
+                    // ------------ PERIODIC POLLING -------
                     function poll() {
                         fetch('/state')
                         .then(res => res.json())
@@ -318,6 +356,17 @@ void setupServer() {
         WiFiserver.send(200, "application/json", json);
     });
 
+    WiFiserver.on("/sensors", [](){
+        float t = 0, h = 0;
+        if (dht_mutex && xSemaphoreTake(dht_mutex, pdMS_TO_TICKS(10)) == pdTRUE) {
+            t = dht_data.temp;
+            h = dht_data.humi;
+            xSemaphoreGive(dht_mutex);
+        }
+        String json = "{\"temp\":" + String(t, 1) + ",\"humi\":" + String(h, 0) + "}";
+        WiFiserver.send(200, "application/json", json);
+    });
+
     WiFiserver.begin();
     Serial.println("[Server] HTTP server started!");
 }
@@ -363,6 +412,7 @@ void main_server_task(void *pvParameters)
     startAPMode();
     connectToWiFi();
     setupServer();
+    xTaskCreate(DHT, "Temp & Humid Sensor", 3072, NULL, 1, NULL);
 
     while (true) {
         WiFiserver.handleClient();
