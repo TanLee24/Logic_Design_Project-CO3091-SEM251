@@ -5,11 +5,12 @@ WebServer WiFiserver(80);
 // State variables for webpage
 bool led_state = false;
 bool neo_state = false;
+bool isAPMode = true;
 
 // NeoPixel object (1 LED)
 Adafruit_NeoPixel pixels(1, NEO_PIN, NEO_GRB + NEO_KHZ800);
 
-int blinkInterval = 500;
+int blinkInterval = 1000;
 bool blinkMode = false;
 
 String WiFiSTA_ID = "ACLAB";
@@ -17,6 +18,8 @@ String WiFiSTA_PASS = "ACLAB2023";
 
 /* ========== HTML PAGE ========== */
 String mainPage() {
+    String currentIP = isAPMode ? WiFi.softAPIP().toString() : WiFi.localIP().toString();
+    String modeText  = isAPMode ? "Access Point Mode" : "Connected to WiFi (Station Mode)";
     return R"rawliteral(
         <!DOCTYPE html>
         <html>
@@ -81,12 +84,28 @@ String mainPage() {
                         top: 10px;
                         right: 10px;
                     }
+
+                    .info {
+                        background: rgba(0,0,0,0.1);
+                        padding: 10px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        margin: 15px auto;
+                        max-width: 300px;
+                    }
                 </style>
             </head>
             
             <body>
                 <button class="toggle btn-blue" onclick="toggleDark()">Toggle Dark Mode</button>
                 <h1>ESP32 Control Panel</h1>
+
+                <!-- IP & Mode Display -->
+                <div class="info">
+                    <strong>Current IP:</strong><br>
+                    )rawliteral" + currentIP + R"rawliteral(<br>
+                    <em>)rawliteral" + modeText + R"rawliteral(</em>
+                </div>
 
                 <!-- LED MANUAL + BLINK MODE -->
                 <div class="card">
@@ -100,8 +119,8 @@ String mainPage() {
                     <button class="btn-on" onclick="send('/blink/start')">Start Blink</button>
                     <button class="btn-off" onclick="send('/blink/stop')">Stop Blink</button>
 
-                    <p>Blink Speed: <span id="speed_label">500 ms</span></p>
-                    <input type="range" min="50" max="2000" value="500" id="blink_slider" oninput="changeSpeed(this.value)">
+                    <p>Blink Speed: <span id="speed_label">1000 ms</span></p>
+                    <input type="range" min="50" max="2000" value="1000" id="blink_slider" oninput="changeSpeed(this.value)">
                 </div>
                 
                 <!-- NEO PIXEL -->
@@ -312,7 +331,9 @@ void WiFiEvent(WiFiEvent_t event)
             Serial.println("[Event] STA Started"); break;
 
         case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-            Serial.println("[Event] Connected to WiFi!"); break;
+            Serial.println("[Event] Connected to WiFi!");
+            isAPMode = false;
+            break;
 
         case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
             Serial.println("[Event] WiFi disconnected! Reconnecting...");
@@ -320,7 +341,9 @@ void WiFiEvent(WiFiEvent_t event)
             break;
 
         case ARDUINO_EVENT_WIFI_AP_START:
-            Serial.println("[Event] AP Started"); break;
+            Serial.println("[Event] AP Started");
+            isAPMode = true;
+            break;
 
         case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
             Serial.println("[Event] Client connected to AP"); break;
