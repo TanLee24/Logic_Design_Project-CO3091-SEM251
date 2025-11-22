@@ -43,16 +43,11 @@ void temp_humi_monitor(void *pvParameters)
         Serial.printf("Temp: %.2f°C | Humi: %.2f%%\n", temperature, humidity);
 
         // --- DISPLAY PAGE 1 (AIR INFO) ---
-        // lcd.clear();
-        // lcd.setCursor(0, 0);
-        // lcd.printf("Temp: %.1f°C", temperature);
-        // lcd.setCursor(0, 1);
-        // lcd.printf("Humi: %.1f%%", humidity);
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("AIR TEMP & HUMI"); // Title line
         lcd.setCursor(0, 1);
-        lcd.printf("T:%.1f°C H:%.1f%%", temperature, humidity); // Data line
+        lcd.printf("T:%.1fC H:%.1f%%", temperature, humidity); // Data line
         
         vTaskDelay(3000); // Hold page 1 for 3s
 
