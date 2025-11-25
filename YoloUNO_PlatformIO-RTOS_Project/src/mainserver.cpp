@@ -33,145 +33,261 @@ String mainPage() {
         <html>
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
                 <title>ESP32 Dashboard</title>
             
                 <style>
                     body {
-                        font-family: Arial;
-                        transition: background 0.4s, color 0.4s;
-                        background: var(--bg);
-                        color: var(--fg);
+                        margin: 0;
+                        font-family: Poppins, Arial;
+                        background: linear-gradient(130deg, var(--bg1), var(--bg2));
+                        color: var(--text);
                         text-align: center;
-                        padding: 20px;
+                    }
+
+                    html, body {
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        background-attachment: fixed;
                     }
 
                     :root {
-                        --bg: #eef2f3;
-                        --fg: #111;
-                        --card-bg: #ffffff;
+                        --bg1: #d9e4ff;
+                        --bg2: #c7d6ff;
+                        --text: #0e111a;
+                        --card-bg: rgba(255,255,255,0.55);
+                        --glass-border: rgba(255,255,255,0.35);
+                        --accent: #5b8bff;
+                        --accent2: #00d4ff;
+                        --ok: #2ecc71;
+                        --bad: #e74c3c;
+                        --radius: 16px;
+                        --shadow: 0 6px 26px rgba(0,0,0,0.18);
                     }
 
                     .dark {
-                        --bg: #121212;
-                        --fg: #e3e3e3;
-                        --card-bg: #1e1e1e;
+                        --bg1: #0e1220;
+                        --bg2: #151b2e;
+                        --text: #f1f1f1;
+                        --card-bg: rgba(255,255,255,0.08);
+                        --glass-border: rgba(255,255,255,0.1);
+                    }
+                        
+                    .page-title {
+                        font-size: 32px;
+                        font-weight: 800;
+                        margin: 10px 0 18px;
+                        letter-spacing: 0.5px;
+                        background: linear-gradient(90deg, #5b8bff, #00d4ff);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        position: relative;
+                    }
+                        
+                    .page-title::after {
+                        content: "";
+                        display: block;
+                        width: 300px;
+                        height: 4px;
+                        margin: 6px auto 0;
+                        border-radius: 10px;
+                        background: linear-gradient(90deg, #5b8bff, #00d4ff);
+                        opacity: 0.75;
+                    }
+
+                    .navbar {
+                        display: flex;
+                        justify-content: flex-start;
+                        gap: 12px;
+                    }
+                        
+                    .nav-btn {
+                        padding: 10px 18px;
+                        background: var(--accent2);
+                        color: white;
+                        border-radius: 12px;
+                        font-weight: 600;
+                        border: none;
+                        cursor: pointer;
                     }
 
                     .card {
+                        width: min(90vw, 380px);
+                        margin: 16px auto;
+                        padding: 16px;
                         background: var(--card-bg);
-                        width: 320px;
-                        padding: 20px;
-                        margin: 20px auto;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+                        border: 1px solid var(--glass-border);
+                        border-radius: var(--radius);
+                        box-shadow: var(--shadow);
+                        backdrop-filter: blur(12px);
+                    }
+
+                    .card-title {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        font-size: 19px;
+                        font-weight: 700;
+                        margin-bottom: 8px;
+                    }
+
+                    .flex-row {
+                        display: flex;
+                        justify-content: center;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                    }
+                       
+                    .device-card {
+                        max-width: 300px;
+                        width: 100%;
+                        flex: none;
+                        margin: 10px;
+                    }
+
+                    .icon {
+                        width: 22px;
+                        height: 22px;
+                        opacity: 0.85;
+                    }
+
+                    .flex-row {
+                        display: flex;
+                        justify-content: center;
+                        gap: 12px;
+                        flex-wrap: wrap;
+                    }
+
+                    .info-chip {
+                        padding: 12px;
+                        background: rgba(255,255,255,0.20);
+                        border-radius: var(--radius);
+                        border: 1px solid var(--glass-border);
+                        width: 160px;
+                    }
+
+                    .sensor-box {
+                        background: rgba(255,255,255,0.20);
+                        padding: 14px;
+                        border-radius: var(--radius);
+                        width: 160px;
+                        border: 1px solid var(--glass-border);
+                    }
+
+                    .sensor-box .value {
+                        font-size: 24px;
+                        font-weight: 700;
                     }
 
                     button {
-                        width: 130px;
-                        height: 45px;
-                        margin: 8px;
-                        border: none;
-                        border-radius: 10px;
+                        border: 0;
                         cursor: pointer;
+                        border-radius: 12px;
+                        padding: 12px 18px; /* compact */
                         font-size: 16px;
                         color: white;
-                        transition: 0.2s;
+                        margin: 5px;
                     }
 
-                    .btn-on { background: #2ecc71; }
-                    .btn-off { background: #e74c3c; }
-                    .btn-blue { background: #3498db; }
+                    .btn-on  { background: linear-gradient(180deg, #32e07d, #1fb862); }
+                    .btn-off { background: linear-gradient(180deg, #ff5c5c, #d13939); }
+                    .btn-blue { background: linear-gradient(180deg, #5b8bff, #3a63d8); }
 
                     input[type=range] {
-                        width: 80%;
-                        margin-top: 15px;
+                        width: 90%;
+                        margin-top: 8px;
+                    }
+
+                    input[type=color] {
+                        width: 55%;
+                        height: 38px;
+                        border-radius: 12px;
+                        border: 2px solid var(--glass-border);
                     }
 
                     .toggle {
                         position: fixed;
-                        top: 10px;
-                        right: 10px;
-                    }
-
-                    .info {
-                        background: rgba(0,0,0,0.1);
-                        padding: 10px;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        margin: 15px auto;
-                        max-width: 300px;
-                    }
-
-                    .sensor {
-                        background: #f8f9fa;
-                        color: #333;
-                        padding: 15px;
-                        border-radius: 12px;
-                        margin: 20px auto;
-                        max-width: 300px;
-                        font-size: 18px;
-                    }
-
-                    .dark .sensor {
-                        background: #2d2d2d;
-                        color: #eee;
+                        top: 14px;
+                        right: 14px;
                     }
                 </style>
             </head>
             
             <body>
+                <div class="navbar">
+                    <button class="btn-blue" onclick="location.href='/'">Control Panel</button>
+                    <button class="btn-blue" onclick="location.href='/settings'">Settings</button>
+                </div>
+
                 <button class="toggle btn-blue" onclick="toggleDark()">Toggle Dark Mode</button>
-                <h1>ESP32 Control Panel</h1>
+                
+                <h2 class="page-title">ESP32 Dashboard</h2>
 
                 <!-- IP + MODE DISPLAY -->
-                <div class="info">
-                    <strong>Current IP:</strong><br>
-                    )rawliteral" + currentIP + R"rawliteral(<br>
-                    <em>)rawliteral" + modeText + R"rawliteral(</em>
+                <div class="flex-row">
+                    <div class="info-chip">
+                        <strong>Current IP:</strong><br>
+                        )rawliteral" + currentIP + R"rawliteral(
+                    </div>
+
+                    <div class="info-chip">
+                        <strong>Current mode:</strong><br>
+                        )rawliteral" + modeText + R"rawliteral(
+                    </div>
+
                 </div>
 
                 <!-- WIFI DISPLAY -->
-                <div class="info">
+                <div class="card" style="max-width:360px;">
                     <strong>Current WiFi:</strong><br>
                     )rawliteral" + (isAPMode ? "ESP32 Access Point" : WiFiSTA_ID) + R"rawliteral(
                 </div>
 
                 <!-- SENSOR -->
-                <div class="sensor">
-                    Temperature: <strong id="temp">--</strong><br>
-                    Humidity: <strong id="humi">--</strong>
-                </div>
-
-                <!-- LED MANUAL + BLINK MODE -->
-                <div class="card">
-                    <h2>LED (D13)</h2>
-                    <p id="led_state">State: --</p>
-
-                    <button class="btn-on" onclick="send('/led/on')">ON</button>
-                    <button class="btn-off" onclick="send('/led/off')">OFF</button>
-
-                    <h3>Blink Mode</h3>
-                    <button class="btn-on" onclick="send('/blink/start')">Start Blink</button>
-                    <button class="btn-off" onclick="send('/blink/stop')">Stop Blink</button>
-
-                    <p>Blink Speed: <span id="speed_label">1000 ms</span></p>
-                    <input type="range" min="50" max="3000" value="1000" id="blink_slider" oninput="changeSpeed(this.value)">
-                </div>
+                <div class="flex-row">
+                    <div class="sensor-box">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v10a4 4 0 1 1-4 4" stroke="currentColor" fill="none"/></svg>
+                        <div class="value" id="temp">-- °C</div>
+                    </div>
                 
-                <!-- NEO PIXEL -->
-                <div class="card">
-                    <h2>NeoPixel LED</h2>
-                    <p id="neo_state">State: --</p>
-
-                    <button class="btn-off" onclick="send('/neo/off')">Turn Off</button>
-
-                    <h3>Pick Color</h3>
-                    <input type="color" id="colorpicker" onchange="setColor(this.value)">
+                    <div class="sensor-box">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2s7 7.5 7 12a7 7 0 1 1-14 0c0-4.7 7-12 7-12z" stroke="currentColor" fill="none"/></svg>
+                        <div class="value" id="humi">-- %</div>
+                    </div>
                 </div>
 
-                <!-- SETTINGS -->
-                <div class="card">
-                    <button class="btn-blue" style="width:100%" onclick="location.href='/settings'">Settings</button>
+                <!-- LED + NEO -->
+                <div class="flex-row">
+                    <!-- LED D13 -->
+                    <div class="card device-card">
+                        <div class="card-title">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="14" r="5" stroke="currentColor" fill="none"/><path d="M12 2v6" stroke="currentColor"/></svg>
+                            LED (D13)
+                        </div>
+                        
+                        <p id="led_state" style="margin:6px 0;">State: --</p>
+                        <button class="btn-on" onclick="send('/led/on')">ON</button>
+                        <button class="btn-off" onclick="send('/led/off')">OFF</button>
+
+                        <h4 style="margin:10px 0 6px;">Blink</h4>
+                        <button class="btn-on" onclick="send('/blink/start')">Start</button>
+                        <button class="btn-off" onclick="send('/blink/stop')">Stop</button>
+                        <p style="margin:8px 0;">Speed: <span id="speed_label">1000 ms</span></p>
+                        <input type="range" min="50" max="3000" value="1000" id="blink_slider" oninput="changeSpeed(this.value)">
+                    </div>
+                    
+                    <!-- NEO PIXEL -->
+                    <div class="card device-card">
+                        <div class="card-title">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" stroke="currentColor" fill="none"/></svg>
+                            NeoPixel
+                        </div>
+                        <p id="neo_state" style="margin:6px 0;">State: --</p>
+                        <button class="btn-off" onclick="send('/neo/off')">Turn Off</button>
+                        <h4 style="margin:10px 0 6px;">Color</h4>
+                        <input type="color" id="colorpicker" onchange="setColor(this.value)">
+                    </div>
                 </div>
             
                 <script>
@@ -244,41 +360,51 @@ String settingsPage() {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <title>WiFi Settings</title>
                 <style>
-                    body {
-                        font-family: Arial;
-                        background: var(--bg);
-                        color: var(--fg);
-                        text-align: center;
-                        padding: 20px;
-                    }
-    
                     :root {
-                        --bg: #eef2f3;
-                        --fg: #111;
-                        --card-bg: #ffffff;
+                        --bg1: #d9e4ff;
+                        --bg2: #c7d6ff;
+                        --text: #0e111a;
+                        --card-bg: rgba(255,255,255,0.55);
+                        --glass-border: rgba(255,255,255,0.35);
+                        --accent: #5b8bff;
+                        --accent2: #00d4ff;
+                        --radius: 16px;
+                        --shadow: 0 6px 26px rgba(0,0,0,0.18);
                     }
-    
+
+                    body {
+                        margin: 0;
+                        font-family: Poppins, Arial;
+                        background: linear-gradient(130deg, var(--bg1), var(--bg2));
+                        color: var(--text);
+                        text-align: center;
+                    }
+                        
                     .dark {
-                        --bg: #121212;
-                        --fg: #e3e3e3;
-                        --card-bg: #1e1e1e; 
+                        --bg1: #0e1220;
+                        --bg2: #151b2e;
+                        --text: #f1f1f1;
+                        --card-bg: rgba(255,255,255,0.08);
+                        --glass-border: rgba(255,255,255,0.1);
                     }
-    
+                        
                     .card {
+                        width: min(90vw, 380px);
+                        margin: 16px auto;
+                        padding: 16px;
                         background: var(--card-bg);
-                        width: 320px;
-                        padding: 20px;
-                        margin: 20px auto;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+                        border: 1px solid var(--glass-border);
+                        border-radius: var(--radius);
+                        box-shadow: var(--shadow);
+                        backdrop-filter: blur(12px);
                     }
                         
                     input {
-                        width: 100%;
+                        width: 90%;
                         padding: 10px;
-                        margin: 10px 0;
+                        margin: 5px 0;
                         border: 1px solid #ccc;
-                        border-radius: 8px;
+                        border-radius: 10px;
                     }
                         
                     .dark input {
@@ -286,33 +412,45 @@ String settingsPage() {
                         background: #333;
                         color: #fff;
                     }
-    
+                        
                     button {
-                        width: 100%;
-                        height: 45px;
-                        margin: 8px 0;
-                        border: none;
-                        border-radius: 10px;
+                        border: 0;
                         cursor: pointer;
+                        border-radius: 12px;
+                        padding: 12px 18px;
                         font-size: 16px;
                         color: white;
-                        background: #3498db;
+                        margin: 5px;
                     }
+
+                    .toggle {
+                        position: fixed;
+                        top: 14px;
+                        right: 14px;
+                    }
+
+                    .btn-on  { background: linear-gradient(180deg, #32e07d, #1fb862); }
+                    .btn-off { background: linear-gradient(180deg, #ff5c5c, #d13939); }
+                    .btn-blue { background: linear-gradient(180deg, #5b8bff, #3a63d8); }
                 </style>
             </head>
-            
-            <body class="dark"> 
-                <!-- Default dark mode, or remove to match main page -->
+            <body>
+                <button class="toggle btn-blue" onclick="toggleDark()">Toggle Dark Mode</button>
                 <div class="card">
                     <h2>WiFi Settings</h2>
                     <form action="/connect" method="GET">
                         <input type="text" name="ssid" placeholder="WiFi SSID" required>
                         <input type="password" name="pass" placeholder="Password" required>
-                        <button type="submit">Connect</button>
+                        <button type="submit" class="btn-on">Connect</button>
                     </form>
-                    <a href="/"><button style="background: #2ecc71;">Back to Dashboard</button></a>
+                    <a href="/"><button class="btn-blue">Back to Dashboard</button></a>
                 </div>
             </body>
+            <script>
+                function toggleDark() {
+                    document.body.classList.toggle("dark");
+                }
+            </script>
         </html>
     )rawliteral";
 }
@@ -530,6 +668,7 @@ void main_server_task(void *pvParameters)
     startAPMode();
     connectToWiFi();
     setupServer();
+    xTaskCreate(blink_mode, "Blink Mode", 4096, NULL, 1, NULL);
     xTaskCreate(DHT, "Temp & Humid Sensor", 3072, NULL, 1, NULL);
 
     while (true) {

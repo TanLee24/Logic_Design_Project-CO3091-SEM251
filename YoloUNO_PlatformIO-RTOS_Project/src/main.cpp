@@ -37,9 +37,7 @@ void setup()
   
   /*************************************** Tuan Anh's tasks *************************************/
   // xTaskCreate(power_demo_task, "Power Demo", 4096, NULL, 1, NULL);
-  // Un-comment both main_server_task and blink_mode to enable web server and blink mode functionality
   xTaskCreate(main_server_task, "Main Server", 8192, NULL, 2, NULL);
-	xTaskCreate(blink_mode, "Blink Mode", 4096, NULL, 1, NULL);
   /********************************************************************************************/
 
   xTaskCreate(led_blinky, "Task LED Blinky", 4096, NULL, 2, NULL);
