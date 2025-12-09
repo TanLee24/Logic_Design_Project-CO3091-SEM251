@@ -6,7 +6,7 @@
 #define LED_GPIO 48
 #define WAKEUP_GPIO 0
 
-RTC_DATA_ATTR int bootCount = 1; // survives Deep Sleep
+RTC_DATA_ATTR int bootCount = 1;
 
 static void print_wakeup_reason() {
 	esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();

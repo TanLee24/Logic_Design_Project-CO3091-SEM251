@@ -17,7 +17,7 @@ bool blinkMode = false;
 String WiFiSTA_ID = "";
 String WiFiSTA_PASS = "";
 
-/* ========== HTML PAGES ========== */
+/* HTML PAGES */
 String mainPage() {
     float temperature = 0, humidity = 0;
     if (dht_mutex && xSemaphoreTake(dht_mutex, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -532,7 +532,7 @@ String connectingPage(String ssid) {
         </html>
     )rawliteral";
 }
-/* ========== WIFI AP + STA SETUP ========== */
+/* WIFI AP + STA SETUP */
 
 void connectToWiFi()
 {
@@ -584,7 +584,7 @@ void startAPMode()
     isAPMode = true;
 }
 
-/* ========== WEBSERVER SETUP ========== */
+/* WEBSERVER SETUP */
 void setupServer() {
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, LOW);
@@ -683,7 +683,7 @@ void setupServer() {
     Serial.println("[Server] HTTP server started!");
 }
 
-/* ========== HANDLER ==========*/
+/* HANDLER */
 
 void WiFiEvent(WiFiEvent_t event)
 {
@@ -717,7 +717,7 @@ void WiFiEvent(WiFiEvent_t event)
     }
 }
 
-/* ========== TASK ========== */
+/* TASKS */
 
 void main_server_task(void *pvParameters)
 {
