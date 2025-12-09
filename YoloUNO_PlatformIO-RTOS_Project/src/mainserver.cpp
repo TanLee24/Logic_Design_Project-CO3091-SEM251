@@ -65,14 +65,6 @@ String mainPage() {
                         --radius: 16px;
                         --shadow: 0 6px 26px rgba(0,0,0,0.18);
                     }
-
-                    .dark {
-                        --bg1: #0e1220;
-                        --bg2: #151b2e;
-                        --text: #f1f1f1;
-                        --card-bg: rgba(255,255,255,0.08);
-                        --glass-border: rgba(255,255,255,0.1);
-                    }
                         
                     .page-title {
                         font-size: 32px;
@@ -219,8 +211,6 @@ String mainPage() {
                     <button class="btn-blue" onclick="location.href='/'">Control Panel</button>
                     <button class="btn-blue" onclick="location.href='/settings'">Settings</button>
                 </div>
-
-                <button class="toggle btn-blue" onclick="toggleDark()">Toggle Dark Mode</button>
                 
                 <h2 class="page-title">ESP32 Dashboard</h2>
 
@@ -291,11 +281,6 @@ String mainPage() {
                 </div>
             
                 <script>
-                    // ---------------- DARK MODE ----------------
-                    function toggleDark() {
-                        document.body.classList.toggle("dark");
-                    }
-                        
                     // ---------------- AJAX COMMAND --------------
                     function send(url) {
                         fetch(url)
@@ -380,14 +365,6 @@ String settingsPage() {
                         text-align: center;
                     }
                         
-                    .dark {
-                        --bg1: #0e1220;
-                        --bg2: #151b2e;
-                        --text: #f1f1f1;
-                        --card-bg: rgba(255,255,255,0.08);
-                        --glass-border: rgba(255,255,255,0.1);
-                    }
-                        
                     .card {
                         width: min(90vw, 380px);
                         margin: 16px auto;
@@ -405,12 +382,6 @@ String settingsPage() {
                         margin: 5px 0;
                         border: 1px solid #ccc;
                         border-radius: 10px;
-                    }
-                        
-                    .dark input {
-                        border-color: #444;
-                        background: #333;
-                        color: #fff;
                     }
                         
                     button {
@@ -435,7 +406,6 @@ String settingsPage() {
                 </style>
             </head>
             <body>
-                <button class="toggle btn-blue" onclick="toggleDark()">Toggle Dark Mode</button>
                 <div class="card">
                     <h2>WiFi Settings</h2>
                     <form action="/connect" method="GET">
@@ -446,11 +416,6 @@ String settingsPage() {
                     <a href="/"><button class="btn-blue">Back to Dashboard</button></a>
                 </div>
             </body>
-            <script>
-                function toggleDark() {
-                    document.body.classList.toggle("dark");
-                }
-            </script>
         </html>
     )rawliteral";
 }
@@ -481,14 +446,6 @@ String connectingPage(String ssid) {
                         background: linear-gradient(130deg, var(--bg1), var(--bg2));
                         color: var(--text);
                         text-align: center;
-                    }
-
-                    .dark {
-                        --bg1: #0e1220;
-                        --bg2: #151b2e;
-                        --text: #f1f1f1;
-                        --card-bg: rgba(255,255,255,0.08);
-                        --glass-border: rgba(255,255,255,0.1);
                     }
 
                     .card {
@@ -545,8 +502,6 @@ String connectingPage(String ssid) {
             </head>
             
             <body>
-                <button class="toggle btn-blue" onclick="toggleDark()">Dark Mode</button>
-
                 <div class="card">
                     <h2 id="statusTitle">Connecting to:<br><b>)rawliteral" + ssid + R"rawliteral(</b></h2>
 
@@ -558,10 +513,6 @@ String connectingPage(String ssid) {
                 </div>
 
                 <script>
-                    function toggleDark() {
-                        document.body.classList.toggle("dark");
-                    }
-
                     function checkConnection() {
                         fetch('/state')
                         .then(r => r.json())
