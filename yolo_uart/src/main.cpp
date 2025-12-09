@@ -8,7 +8,7 @@ void setup()
     Serial.println("Booting...");
 
     // Serial1: RX=44, TX=43
-    Serial1.begin(115200, SERIAL_8N1, 44, 43);
+    Serial1.begin(115200, SERIAL_8N1, 43, 44);
 }
 
 void loop()
